@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Welcome to our router configuration web</title>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+
+  <h1>Router Configuration</h1>
+
+  <div>
+
+    <h2>Configuración de Reenvío de Puertos</h2>
+
+      <label for="interface">Interfaz:</label>
+
+      <select id="interface">
+
+          <option value="WAN">WAN</option>
+
+          <option value="LAN">LAN</option>
+
+      </select>
+
+      <label for="protocol">Protocolo:</label>
+
+      <select id="protocol">
+
+          <option value="tcp">TCP</option>
+
+          <option value="udp">UDP</option>
+
+          <option value="any">Any</option>
+
+      </select>
+
+      <label for="redirectIp">IP de Redirección:</label>
+
+      <input type="text" id="redirectIp" placeholder="IP de Redirección">
+
+      <button type="button" onclick="crearReglaPortForward()">Create NAT port forward</button>	
+
+  </div>
+  <div>
+    <h2>Aplicar canvis firewall</h2>
+    <div class="container">
+      <button type="button" onclick="aplicarCanvis()">Aplicar</button>
+    </div>
+  </div> 
+  <div class="todo">
+    <h2>Change Wifi name</h2>
+    <label for="newWifiName"><b>New WiFi Name</b></label>
+    <input type="nameWifi" placeholder="Enter New WiFi Name" name="newWifiName" id="newWifiName" required>
+    <button type="button" onclick="changeWifiName()">Change WiFi's Name</button>
+  </div>
+  <div class="todo">
+    <h2>Change Wifi password</h2>
+    <label for="newWifiPassword"><b>New WiFi Password</b></label>
+    <input type="password" placeholder="Enter New WiFi Password" name="newWifiPassword" id="newWifiPassword" required>
+    <button type="button" onclick="changeWifiPassword()">Change WiFi's Password</button>
+  </div>
+  <div class="container">
+    <h2>Connected Devices</h2>
+      <div class="container">
+        <button type="button" onclick="hideDeviceList()">Show Connected Devices</button>
+        <ul id="deviceList"></ul>
+      </div>
+  </div>
+  <div class="todo">
+    <h2>Connection Status</h2>
+    <div class="container">
+      <button type="button" onclick="getWiFiStatus()">Show WiFi Connection Status</button>
+      <p id="wifiStatus"></p>
+    </div>
+  </div>
+  <div>
+    <h2>Router Restart</h2>
+    <div class="container">
+      <button type="button" onclick="restartRouter()">Restart Router</button>
+    </div>
+  </div>
+  <div class="todo">
+    <label for="portNumber"><h2>Port Number</h2></label>
+    <input type="number" placeholder="Enter Port Number" name="portNumber" id="portNumber" required>
+    <label for="portType"><b>Port Type</b></label>
+    <select id="portType" name="portType">
+      <option value="tcp">TCP</option>
+      <option value="udp">UDP</option>
+    </select>
+    <label for="portAction"><b>Action</b></label>
+    <select id="portAction" name="portAction">
+      <option value="open">Open</option>
+      <option value="close">Close</option>
+    </select>
+    <button type="button" onclick="configurePort()">Configure Port</button>
+  </div>
+  <div class="todo">
+    <h2>DHCP Configuration</h2>
+    <label for="dhcpEnable"><b>DHCP Enable</b></label>
+    <select id="dhcpEnable" name="dhcpEnable">
+      <option value="true">Enabled</option>
+      <option value="false">Disabled</option>
+    </select>
+    <label for="startIP"><b>Start IP Address</b></label>
+    <input type="text" placeholder="Enter Start IP Address" name="startIP" id="startIP" required>
+    <label for="endIP"><b>End IP Address</b></label>
+    <input type="text" placeholder="Enter End IP Address" name="endIP" id="endIP" required>
+    <button type="button" onclick="configureDHCP()">Configure DHCP</button>
+  </div>
+  
+  <div class="todo">
+    <h2>Restore Router to Default Settings</h2>
+    <button type="button" onclick="restoreRouter()">Restore to Default Settings</button>
+  </div>
+  <style>
+  .todo {
+    color: red;
+  }
+  </style>
+  <script>
+
+    function crearReglaPortForward() {
+
+            const configuracionNueva = {
+
+                apply: true,
+
+                descr: "Reenvío de Puerto para Aplicación Web",
+
+                disabled: false,
+
+                dst: "any",
+
+                dstport: "any",
+
+                interface: document.getElementById('interface').value,
+
+                localPort: "8080",
+
+                natreflection: "enable",
+
+                nordr: false,
+
+                nosync: false,
+
+                protocol: document.getElementById('protocol').value,
+
+                src: "any",
+
+                srcport: "any",
+
+                target: document.getElementById('redirectIp').value,
+
+                top: false
+            };
+
+            axios.post('http://1.0.0.1:8000/configPortForward', configuracionNueva) 
+  		  .then(response => {
+        		console.log({ success: true, data: response.data });
+    		  })
+   		  .catch(error => {
+       			 console.error('Error:', error);
+    		  });
+    }
+    var role = getParameterByName('role');
+    function changeWifiPassword() {
+      var newWifiPassword = document.getElementById("newWifiPassword").value;
+        console.log("New WiFi Password: " + newWifiPassword);
+        alert("WiFi Password changed successfully!");
+    }
+    // Funció per cambiar el nom del WiFi
+    function changeWifiName() {
+      var newWifiName = document.getElementById("newWifiName").value;
+      console.log("New WiFi Name: " + newWifiName);
+      alert("WiFi Name changed successfully!");
+    }
+    function hideDeviceList() {
+      var deviceList = document.getElementById('deviceList');
+      deviceList.style.display = (deviceList.style.display === 'none') ? 'block' : 'none';
+      if (deviceList.style.display === 'block') {
+        getConnectedDevices();
+      }
+    }
+    function getConnectedDevices() {
+    axios.get('http://1.0.0.1:8000/dispositiusConnectats') 
+	  .then(response => {
+		console.log({ success: true, data: response.data });
+		var devices = response.data.data.data;
+		displayDeviceList(devices);
+	  })
+	  .catch(error => {
+		 console.error('Error:', error);
+	  });
+      
+    }
+    function displayDeviceList(devices) {
+      var deviceList = document.getElementById('deviceList');
+      deviceList.innerHTML = '';
+      devices.forEach(device => {
+        var listItem = document.createElement('li');
+        listItem.textContent = device.hostname + ' - ' + device.ip + ' - ' + device.mac + ' - ' + device.online;
+        deviceList.appendChild(listItem);
+      });
+    }
+
+    function getWiFiStatus() {
+      var wifiStatus = 'Connected'; 
+      displayWiFiStatus(wifiStatus);
+    }
+    function displayWiFiStatus(status) {
+      var wifiStatusElement = document.getElementById('wifiStatus');
+      wifiStatusElement.textContent = 'WiFi Connection Status: ' + status;
+    }
+    // Funció per obtenir el rol de la URL
+    function getParameterByName(name, url = window.location.href) {
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+    function restartRouter() {
+      axios.post('http://1.0.0.1:8000/restartRouter') 
+
+  		  .then(response => {
+        		console.log({ success: true, data: response.data });
+        		alert("El router s'ha reiniciat");
+    		  })
+
+   		 .catch(error => {
+       			 console.error('Error:', error);
+       			 alert("Error!");
+    		});
+    }
+    function aplicarCanvis() {
+      axios.post('http://1.0.0.1:8000/aplicarCanvis') 
+
+  		  .then(response => {
+        		console.log({ success: true, data: response.data });
+        		alert("S'han aplicat els canvis");
+    		  })
+
+   		 .catch(error => {
+       			 console.error('Error:', error);
+       			 alert("Error!");
+    		});
+    }
+    
+    function configurePort() {
+      var portNumber = document.getElementById("portNumber").value;
+      var portType = document.getElementById("portType").value;
+      var portAction = document.getElementById("portAction").value;
+      alert("Port configuration successful.");
+    }
+
+    function configureDHCP() {
+      var dhcpEnable = document.getElementById("dhcpEnable").value;
+      var startIP = document.getElementById("startIP").value;
+      var endIP = document.getElementById("endIP").value;
+      alert("DHCP configuration successful.");
+    }
+
+    function restoreRouter() {
+        // Simulació de éxit
+        alert("Restoration to defualt settings have done correctly!.");
+    }
+
+    
+
+</script>
+
+</body>
+</html>

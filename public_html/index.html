@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LOGIN</title>
+</head>
+<body>
+  <h2>Login:</h2>
+  <div class="container">
+    <label for="username"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username" name="username" id="username" required>
+  
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+  
+    <button type="button" onclick="autenticar()">Login</button>
+  </div>
+  <div class="container" style="background-color:#f1f1f1">
+    <span class="psw">Forgot <a href="#">password?</a></span>
+  </div>
+
+  <script>
+    function autenticar() {
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("psw").value;
+
+      if (username === "admin" && password === "admin") {
+        window.location.href = "configRouter.html?role=admin";
+      } else if (localStorage.getItem(username) === password) {
+        window.location.href = "index2.html?role=basic";
+      } else {
+        alert("INVALID CREDENTIALS, TRY AGAIN!");
+      }
+    }
+  </script>
+</body>
+</html>
